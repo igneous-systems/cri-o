@@ -24,6 +24,7 @@ unexport GOBIN
 endif
 GOPKGDIR := $(GOPATH)/src/$(PROJECT)
 GOPKGBASEDIR := $(shell dirname "$(GOPKGDIR)")
+GOPKGBASENAME := $(shell basename "$(GOPKGDIR)")
 
 # Update VPATH so make finds .gopathok
 VPATH := $(VPATH):$(GOPATH)
@@ -47,7 +48,7 @@ help:
 .gopathok:
 ifeq ("$(wildcard $(GOPKGDIR))","")
 	mkdir -p "$(GOPKGBASEDIR)"
-	ln -s "$(CURDIR)" "$(GOPKGBASEDIR)"
+	ln -s "$(CURDIR)" "$(GOPKGBASEDIR)/$(GOPKGBASENAME)"
 endif
 	touch "$(GOPATH)/.gopathok"
 
