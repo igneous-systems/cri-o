@@ -80,10 +80,10 @@ crio: .gopathok $(shell hack/find-godeps.sh $(GOPKGDIR) cmd/crio $(PROJECT))
 		$(PROJECT)/cmd/crio
 
 crioctl: .gopathok $(shell hack/find-godeps.sh $(GOPKGDIR) cmd/crioctl $(PROJECT))
-	$(GO) build -o $@ $(PROJECT)/cmd/crioctl
+	$(GO) build -tags "$(BUILDTAGS)" -o $@ $(PROJECT)/cmd/crioctl
 
 kpod: .gopathok $(shell hack/find-godeps.sh $(GOPKGDIR) cmd/kpod $(PROJECT))
-	$(GO) build $(LDFLAGS) -o $@ $(PROJECT)/cmd/kpod
+	$(GO) build -tags "$(BUILDTAGS)" $(LDFLAGS) -o $@ $(PROJECT)/cmd/kpod
 
 crio.conf: crio
 	./crio --config="" config --default > crio.conf
