@@ -7,6 +7,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/containers/image/copy"
 	"github.com/containers/image/types"
+	"github.com/kubernetes-incubator/cri-o/pkg/storage"
 	"golang.org/x/net/context"
 	pb "k8s.io/kubernetes/pkg/kubelet/api/v1alpha1/runtime"
 )
@@ -57,10 +58,26 @@ func (s *Server) PullImage(ctx context.Context, req *pb.PullImageRequest) (*pb.P
 	}
 
 	// let's be smart, docker doesn't repull if image already exists.
-	if _, err := s.StorageImageServer().ImageStatus(s.ImageContext(), image); err == nil {
-		return &pb.PullImageResponse{
-			ImageRef: image,
-		}, nil
+	var storedImage *storage.ImageResult
+	storedImage, err = s.StorageImageServer().ImageStatus(s.ImageContext(), image)
+	if err == nil {
+		tmpImg, err := s.StorageImageServer().PrepareImage(s.ImageContext(), image, options)
+		if err == nil {
+			tmpImgConfigDigest := tmpImg.ConfigInfo().Digest
+			if tmpImgConfigDigest.String() == "" {
+				// this means we are playing with a schema1 image, in which
+				// case, we're going to repull the image in any case
+				logrus.Debugf("image config digest is empty, re-pulling image")
+			} else if tmpImgConfigDigest.String() == storedImage.ConfigDigest.String() {
+				logrus.Debugf("image %s already in store, skipping pull", img)
+				resp := &pb.PullImageResponse{
+					ImageRef: image,
+				}
+				logrus.Debugf("PullImageResponse: %+v", resp)
+				return resp, nil
+			}
+		}
+		logrus.Debugf("image in store has different ID, re-pulling %s", img)
 	}
 
 	if _, err := s.StorageImageServer().PullImage(s.ImageContext(), image, options); err != nil {

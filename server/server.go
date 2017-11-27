@@ -70,7 +70,8 @@ type Server struct {
 	appArmorEnabled bool
 	appArmorProfile string
 
-	stream streamService
+	bindAddress string
+	stream      streamService
 }
 
 // GetExec returns exec stream request
@@ -625,6 +626,7 @@ func New(config *Config) (*Server, error) {
 			return nil, err
 		}
 	}
+	s.bindAddress = bindAddress.String()
 
 	_, err = net.LookupPort("tcp", config.StreamPort)
 	if err != nil {
