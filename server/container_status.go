@@ -96,27 +96,6 @@ func (s *Server) ContainerStatus(ctx context.Context, req *pb.ContainerStatusReq
 			resp.Status.Reason = errorReason
 			resp.Status.Message = cState.Error
 		}
-	case oci.ContainerStatePaused:
-	default:
-		// This should trigger when a container is being created and
-		// its state hasn't been read or persisted yet.
-		// Get the authoritative container status from runtime to filter
-		// out containers that failed to create which are cleaned up
-		// on failure.
-		err := s.Runtime().UpdateStatus(c)
-		if err == nil {
-			uncState := s.Runtime().ContainerStatus(c)
-			switch uncState.Status {
-			case oci.ContainerStateCreated, oci.ContainerStateRunning, oci.ContainerStateStopped:
-				// Ignore already handled states
-			default:
-				// Don't use Started since we do want to know
-				// containers that were saved but never started.
-				if !uncState.Created.IsZero() {
-					resp.Status.CreatedAt = uncState.Created.UnixNano()
-				}
-			}
-		}
 	}
 
 	resp.Status.State = rStatus
