@@ -1,3 +1,8 @@
+
+This is the Igneous fork of [github.com/cri-o/cri-o].  This repo
+contains customizations that are not (yet) upstream. We vendor this repo into
+our product codebase.  We provide no support for this repo.
+
 ![CRI-O logo](logo/crio-logo.svg)
 # CRI-O - OCI-based implementation of Kubernetes Container Runtime Interface
 
