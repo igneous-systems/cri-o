@@ -1,0 +1,7 @@
+description: Build kubernetes-incubator/cri-o
+
+pr: True
+quartz: 0
+
+jobs:
+    - build

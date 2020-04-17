@@ -1,0 +1,13 @@
+description: Build
+
+slavetypes:
+    - c3.xlarge
+
+steps:
+    - Checkout
+
+    - ShellCommand:
+        command: >
+            PATH=$PATH:/usr/src/go1.8/go/bin annotate-output
+            make install.tools docs all
+        maxTime: 2400
